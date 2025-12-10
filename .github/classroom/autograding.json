@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "name": "Flag (regex)",
+      "run": "python3 main.py",
+      "input": "",
+      "output": "^IngSw\\{N0w_u_kn0w_h0w_t0_g0_b4ck_1n_t1m3\\}\\s*$",
+      "comparison": "regex",
+      "timeout": 10,
+      "points": 10
+    }
+  ],
+  "setup": "",
+  "teardown": "",
+  "version": 0
+}
