@@ -9,6 +9,7 @@
 .form {
  width: 100%;
   max-width: 350px;
+  min-width: 320px;              /* <-- CHIAVE per far comparire lo scroll orizzontale */
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -138,4 +139,118 @@ input[type="checkbox"] {
   .form h2 {
     font-size: 1.5rem;
   }
+
+  .passwordLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  }
 }
+
+
+.eye {
+  cursor: pointer;
+  font-size: 18px;
+  user-select: none;
+}
+
+.checkedRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Contenitore */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+/* Checkbox nascosta */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Ovale */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000000;
+  transition: 0.3s;
+  border-radius: 34px;
+}
+
+/* Pallino */
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+/* Stato ON */
+.switch input:checked + .slider {
+  background-color: #6366f1;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
+.switchLabel {
+  font-size: 14px;
+}
+/* Box requisiti password (responsive) */
+.passwordHint {
+  width: 100%;
+  box-sizing: border-box;
+
+  margin-top: 0.5rem;
+  padding: 0.75rem 0.9rem;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+
+  background:rgba(255, 255, 255, 0.1);          /* sfondo visibile */
+  color: #111;                  /* colore base testo */
+
+  overflow-wrap: anywhere;      /* evita sovrapposizioni */
+  word-break: break-word;
+}
+
+.hintTitle {
+  margin: 0 0 8px 0;
+  font-weight: 600;
+  color: white;
+}
+
+/* Lista: niente grid “strano”, usa 1 colonna e spazio stabile */
+.hintList {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  grid-template-columns: 1fr;   /* 1 colonna = niente accavallamenti */
+  gap: 6px;
+}
+
+.hintList li {
+  line-height: 1.25;            /* evita righe che si schiacciano */
+}
+
+/* Colori: più robusti, non dipendono da .hintList li.ok */
+.ok  { color: #2e7d32 !important; }
+.bad { color: #c62828 !important; }
