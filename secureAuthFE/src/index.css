@@ -37,7 +37,9 @@ body {
   overflow-x: auto; 
   overflow-y: auto;             
   box-sizing: border-box;
-  background: #000;         /* sfondo dark */
+  background: #000; 
+    overflow-x:auto;
+        /* sfondo dark */
 }
 
 h1 {

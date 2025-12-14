@@ -1,13 +1,13 @@
 import './App.css'
-import FormRegister from './components/formRegister';
+import Register from './pages/Register.jsx';
 
 function App() {
 
   return (
     <>
-    <FormRegister></FormRegister>
+    <Register></Register>
     </>
   );
 }
 
-export default App
+export default App;

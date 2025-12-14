@@ -9,7 +9,6 @@
 .form {
  width: 100%;
   max-width: 350px;
-  min-width: 320px;              /* <-- CHIAVE per far comparire lo scroll orizzontale */
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -18,6 +17,28 @@
   border-radius: 10px;
   margin: 0 auto;           /* giusto per sicurezza */
 }
+
+
+.form label{
+  display: block;          /* ✅ torna normale */
+  font-size: 0.9rem;
+  line-height: 1.25;       /* ✅ evita effetto accavallato */
+  text-align: center;      /* se vuoi centrarle */
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.labelRow{ /*per riga password*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  line-height: 1.25;
+}
+
+
+
 
 /* Titolo */
 .form h2 {
@@ -150,7 +171,7 @@ input[type="checkbox"] {
 
 .eye {
   cursor: pointer;
-  font-size: 18px;
+  font-size: 1.1rem;
   user-select: none;
 }
 
@@ -254,3 +275,29 @@ input[type="checkbox"] {
 /* Colori: più robusti, non dipendono da .hintList li.ok */
 .ok  { color: #2e7d32 !important; }
 .bad { color: #c62828 !important; }
+
+.auth-links{
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+
+  flex-wrap: wrap;            /* ✅ se non c'è spazio, vanno a capo */
+  text-align: center;
+}
+
+.auth-links a{
+  font-size: 0.9rem;
+  line-height: 1.2;           /* ✅ evita accavallamenti */
+  white-space: normal;        /* ✅ consenti a capo */
+  overflow-wrap: anywhere;    /* ✅ spezza se serve */
+}
+
+/* Su schermi piccoli: mettili in colonna */
+@media (max-width: 420px){
+  .auth-links{
+    flex-direction: column;
+    gap: 0.25rem;             /* ✅ li avvicini */
+    align-items: center;
+  }
+}
