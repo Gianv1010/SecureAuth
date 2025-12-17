@@ -26,6 +26,7 @@
   text-align: center;      /* se vuoi centrarle */
   overflow-wrap: break-word;
   word-break: normal;
+  margin: 0.5rem;
 }
 
 .labelRow{ /*per riga password*/
@@ -100,7 +101,8 @@ input[type="checkbox"] {
 
 /* Bottone submit */
 .form input[type="submit"] {
-  margin-top: 0.5rem;
+  width: 100%;
+  margin-top: 0.7rem;
   padding: 0.7rem 1rem;
   border-radius: 999px;
   border: none;

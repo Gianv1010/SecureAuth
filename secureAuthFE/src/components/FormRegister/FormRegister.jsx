@@ -1,16 +1,65 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState } from "react"; //serve per: 1. calcolare un valore. 2.salvarlo in memoria. 3. ricalcolarlo solo quando cambiano alcune dipendenze
 import "./formRegister.css";
 import {Link} from "react-router-dom"
  function FormRegister() {
 
-   const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [password, setPassword] = useState("");
+  //const [password, setPassword] = useState("");
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  
+  // state per l'invio del form
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    enable2FA: false
+  });
+
+   function handleChange(e) {
+    const { name, value, type, checked } = e.target; //destrutturazione di un oggetto serve per prendere il name e il value degli input (di cui name diventa la chiave per prendere i value degli input)
+                                      // equivalente: const name = e.target.name;
+                                                    //const value = e.target.value;
+    setFormData(prev => ({
+      ...prev, //prende tutti i campi aggiunti precedentemente
+      [name]: type === "checkbox" ? checked : value //ci inserisce quello per cui è stato chiamata la funzione, di cui name è il name dell'input e value il valore inserito
+    }));
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault(); //evita il comportamento di default del browser, cioè il ricarcio della pagina => l'azzeramento degli state => perdita di dati nel form
+
+    //JSON da mandare al backend
+    const payload = {
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+      enable2FA: formData.enable2FA
+    };
+
+    console.log("JSON inviato:", payload);
+
+    // esempio fetch
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      console.log("Risposta backend:", data);
+    } catch (err) {
+      console.error("Errore:", err);
+    }
+  }
 
     // Requisiti password
-  const checks = useMemo(() => {
+  const checks = useMemo(() => { 
+    const password = formData.password;
     return {
       length: password.length >= 8,
       upper: /[A-Z]/.test(password),
@@ -18,43 +67,47 @@ import {Link} from "react-router-dom"
       number: /[0-9]/.test(password),
       special: /[^A-Za-z0-9]/.test(password), // qualsiasi carattere non alfanumerico
     };
-  }, [password]);
+  }, [formData.password]); //valore che deve cambiare per attivare useMemo
 
     return(
     <>
     <div className='form'>
         <h2>Registrazione</h2>
+
+        <form onSubmit={handleSubmit}>
+
         <label>Username</label>
-        <input type="text" name="username" placeholder="Username..." maxLength={30} request></input>
+        <input type="text" name="username" placeholder="Username..." onChange={handleChange} maxLength={30} required></input>
+
         <label>Email</label>
-        <input type="email" name="email" placeholder="Email..." request></input>
+        <input type="email" name="email" placeholder="Email..." onChange={handleChange} required></input>
+        
         <label className="labelRow">Password 
             <span className="eye" onClick={() => setShowPassword(!showPassword)}>{showPassword ? "🙊" : "🙈"}</span>
         </label>
-        <input type={showPassword ? "text" : "password"} name="password" placeholder="Password..." minLength={8} maxLength={256}  onChange={(e) => setPassword(e.target.value)} onFocus={() => setIsPasswordFocused(true)} onBlur={() => setIsPasswordFocused(false)}request></input>
-        {/* BOX REQUISITI (si apre mentre scrive/focus) */}
-        {isPasswordFocused && (
-  <div className="passwordHint">
-    <p className="hintTitle">La password deve contenere:</p>
-    <ul className="hintList">
-      <li className={checks.length ? "ok" : "bad"}>Almeno 8 caratteri</li>
-      <li className={checks.upper ? "ok" : "bad"}>Almeno 1 lettera maiuscola (A-Z)</li>
-      <li className={checks.lower ? "ok" : "bad"}>Almeno 1 lettera minuscola (a-z)</li>
-      <li className={checks.number ? "ok" : "bad"}>Almeno 1 numero (0-9)</li>
-      <li className={checks.special ? "ok" : "bad"}>Almeno 1 carattere speciale (es. ! @ # ?)</li>
-    </ul>
-  </div>
-)}
-
+        <input type={showPassword ? "text" : "password"} name="password" placeholder="Password..." onChange={handleChange} minLength={8} maxLength={256}  onFocus={() => setIsPasswordFocused(true)} onBlur={() => setIsPasswordFocused(false)} required></input>
+            {/* BOX REQUISITI (si apre mentre scrive/focus) */}
+            {isPasswordFocused && (
+                <div className="passwordHint">
+                  <p className="hintTitle">La password deve contenere:</p>
+                    <ul className="hintList">
+                      <li className={checks.length ? "ok" : "bad"}>Almeno 8 caratteri</li>
+                      <li className={checks.upper ? "ok" : "bad"}>Almeno 1 lettera maiuscola (A-Z)</li>
+                      <li className={checks.lower ? "ok" : "bad"}>Almeno 1 lettera minuscola (a-z)</li>
+                      <li className={checks.number ? "ok" : "bad"}>Almeno 1 numero (0-9)</li>
+                      <li className={checks.special ? "ok" : "bad"}>Almeno 1 carattere speciale (es. ! @ # ?)</li>
+                    </ul>
+                </div>
+              )}
 
         <label className="labelRow">Conferma password 
             <span className="eye" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? "🙊" : "🙈"}</span>
         </label>
-        <input type={showConfirmPassword ? "text" : "password"} name="confermaPassword" placeholder="Conferma password..." minLength={8} maxLength={256} request></input>
+        <input type={showConfirmPassword ? "text" : "password"} name="confermaPassword" placeholder="Conferma password..." onChange={handleChange} minLength={8} maxLength={256} required></input>
         
         <div className="checkedRow">
             <label className="switch">
-                <input type="checkbox" name="twoFactor" />
+                <input type="checkbox" name="enable2FA" onChange={handleChange}/>
                 <span className="slider"></span>
             </label>
             <span className="switchLabel">2FA</span>
@@ -62,7 +115,10 @@ import {Link} from "react-router-dom"
 
 
         <input type="submit" value="Registrati"></input>
-    <p><Link to={'/Login'}>Ho già un account</Link></p>
+        
+        </form>
+        
+        <p><Link to={'/Login'}>Ho già un account</Link></p>
 
     </div>
     </>
