@@ -1,0 +1,10 @@
+target
+.git
+.idea
+.vscode
+.DS_Store
+.gitattributes
+.project
+.classpath
+.settings
+.mvn

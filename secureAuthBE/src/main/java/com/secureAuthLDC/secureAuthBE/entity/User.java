@@ -4,8 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity //dice che user è una tabella, ogni oggetto è una riga mentre ogni variabile è una colonna della tabella del DB
+@Table(name = "users") //cambio il nome della tabella Utenti in postress con users, perchè user in postgress è una parola riservata
 public class User {
 
     @Id //indica che id è la chiave primaria della tabella

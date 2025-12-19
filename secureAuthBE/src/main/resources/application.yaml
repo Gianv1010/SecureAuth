@@ -1,3 +1,10 @@
 spring:
   application:
     name: secureAuthBE
+crypto:
+aes:
+# Mettila come variabile d'ambiente (consigliato)
+keyBase64: ${AES_GCM_KEY_BASE64:}
+# Parametri standard AES-GCM
+ivLengthBytes: 12
+tagLengthBits: 128
