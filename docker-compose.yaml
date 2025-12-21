@@ -2,10 +2,12 @@ services:
   db:
     image: postgres:16
     container_name: secureauth-db
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: secureauth
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123!?
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -18,16 +20,21 @@ services:
     container_name: secureauth-be
     depends_on:
       - db
+    env_file:
+      - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/secureauth
-      SPRING_DATASOURCE_USERNAME: admin 
-      SPRING_DATASOURCE_PASSWORD: admin123!?
-      #DDL_AUTO mi permette di generare tabelle in base alle entity del backend
-      #il parametro update è utile in sviluppo perchè mi permette di poter modificare sempre le tabelle, in quanto se aggiunto attributi o tuple
-      #aggiorna il DB in automatico, dato che in sviluppo potrei aver bisogno di aggiungere attributi o toglierli.
-      #in produzione utilizzerò Flyway/Liqibase in quanto mi permettono di mantenere un DB in maniera piu sicura con log, rollback del db, migration piu sicure ecc
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update 
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect #genero sql compatibile con postgress
+      SECURITY_JWT_SECRET: ${SECURITY_JWT_SECRET}
+      SECURITY_JWT_EXPIRATION_MINUTES: ${SECURITY_JWT_EXPIRATION_MINUTES}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT}
+    security: #inserisco queste config anche qui, perchè cosi se mi scordo di configurare la JWT mi esce subito errore all'avvio di spring
+      jwt:
+        secret: ${SECURITY_JWT_SECRET}
+        expiration-minutes: ${SECURITY_JWT_EXPIRATION_MINUTES:15}
+
     ports:
       - "8080:8080"
 
