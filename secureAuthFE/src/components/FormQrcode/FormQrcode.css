@@ -1,0 +1,90 @@
+/* Container principale della card (uguale al form di login) */
+.form {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 400px; /* Larghezza massima della card */
+    margin: 50px auto; /* Centra la card nella pagina */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombreggiatura leggera */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Titolo */
+.form h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+/* Etichette */
+.form label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #555;
+    display: block;
+}
+
+/* Campi di input */
+.form input[type="text"],
+.form input[type="password"],
+.form input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Assicura che il padding non sballi la larghezza */
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form input:focus {
+    border-color: #007bff; /* Colore blu al focus */
+    outline: none;
+}
+
+/* Bottone di invio */
+.form input[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff; /* Blu standard (puoi cambiarlo col colore del tuo amico) */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, opacity 0.3s;
+    margin-top: 10px;
+}
+
+.form input[type="submit"]:hover {
+    background-color: #0056b3; /* Blu più scuro all'hover */
+}
+
+.form input[type="submit"]:disabled {
+    cursor: not-allowed;
+    background-color: #ccc;
+}
+
+/* Link in basso */
+.auth-links {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.auth-links a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}

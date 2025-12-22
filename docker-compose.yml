@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15-alpine        #dice a docker di usare l'immagine di Postgres versione 15 basata su Alpine Linux
+    container_name:  security_db     #nome che abbiamo deciso del container Docker
+    environment:            
+      POSTGRES_USER: admin                #imposta il nome utente del database
+      POSTGRES_PASSWORD: password123      #imposta la password del database
+      POSTGRES_DB: identity_db            #imposta il nome del database
+    ports:
+      - "5432:5432"                       #mappa la porta 5432 del container alla porta 5432 della macchina host
+    volumes:
+      - db_data:/var/lib/postgresql/data  #monta un volume Docker per persistere i dati del database
+volumes:
+  db_data:
