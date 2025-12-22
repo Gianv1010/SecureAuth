@@ -21,17 +21,17 @@ public class User {
     private String username;
     private String email;
     private String passwordHash;
-    private boolean twoFactorEnabled;
+    private boolean enable2FA;
     private String totpSecret; //parola segreta per collegare il backend all'app di autenticazione
 
     //costruttore di default
     public User() {}
     
-    public User(String username, String email, String passwordHash, boolean twoFactorEnabled, String totpSecret) {
+    public User(String username, String email, String passwordHash, boolean enable2FA, String totpSecret) {
     	this.username = username;
     	this.email = email;
     	this.passwordHash = passwordHash;
-    	this.twoFactorEnabled = twoFactorEnabled;
+    	this.enable2FA = enable2FA;
     	this.totpSecret = totpSecret;
     }
 
@@ -63,12 +63,12 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    public boolean isTwoFactorEnabled() {
-        return twoFactorEnabled;
+    public boolean getEnable2FA() {
+        return enable2FA;
     }
 
-    public void setTwoFactorEnabled(boolean twoFactorEnabled) {
-        this.twoFactorEnabled = twoFactorEnabled;
+    public void setEnable2FA(boolean enable2FA) {
+        this.enable2FA = enable2FA;
     }
 
     public String getTotpSecret() { 

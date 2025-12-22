@@ -2,3 +2,23 @@ spring:
   application:
     name: secureAuthBE
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/secureauth
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # per sviluppo (crea/aggiorna tabelle)
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-minutes: ${SECURITY_JWT_EXPIRATION_MINUTES}
+  tink:
+    keyset-b64: ${TINK_KEYSET_B64}

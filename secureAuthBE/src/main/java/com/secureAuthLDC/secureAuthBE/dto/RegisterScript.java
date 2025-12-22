@@ -5,7 +5,7 @@ public class RegisterScript {
 	private String username;
 	private String email;
     private String password;
-    private boolean twoFactorEnabled;
+    private boolean enable2FA;
    
     //i setter di questa classe sono necessari perchè vengono utilizzati da Jackson (componente utile per convertire da json a oggetto java)
 
@@ -39,11 +39,11 @@ public class RegisterScript {
     
     
     
-    public boolean getTwoFactorEnabled() { 
-    	return twoFactorEnabled; 
+    public boolean getEnable2FA() { 
+    	return enable2FA; 
     }
     
-    public void setTwoFactorEnabled(boolean twoFactorEnabled) { 
-    	this.twoFactorEnabled = twoFactorEnabled;
+    public void setEnable2FA(boolean enable2FA) { 
+    	this.enable2FA = enable2FA;
     }
 }
