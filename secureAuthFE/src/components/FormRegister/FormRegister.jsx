@@ -38,7 +38,7 @@ import { useNavigate } from "react-router-dom";
       username: formData.username,
       email: formData.email,
       password: formData.password,
-      confirmPassword: formData.confermaPassword,
+      confirmPassword: formData.confirmPassword,
       enable2FA: formData.enable2FA
     };
 
@@ -46,12 +46,10 @@ import { useNavigate } from "react-router-dom";
 
     // esempio fetch
     try {
-      const response = await fetch("http://localhost:8080/api/auth/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -115,7 +113,7 @@ import { useNavigate } from "react-router-dom";
         <label className="labelRow">Conferma password 
             <span className="eye" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? "🙊" : "🙈"}</span>
         </label>
-        <input type={showConfirmPassword ? "text" : "password"} name="confermaPassword" placeholder="Conferma password..." onChange={handleChange} minLength={8} maxLength={256} required></input>
+        <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="Conferma password..." onChange={handleChange} minLength={8} maxLength={256} required></input>
         
         <div className="checkedRow">
             <label className="switch">

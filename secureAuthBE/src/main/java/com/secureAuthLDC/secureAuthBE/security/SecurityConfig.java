@@ -51,7 +51,7 @@ public class SecurityConfig {
     CorsConfiguration config = new CorsConfiguration();
 
     // in dev: consenti il frontend locale
-    config.setAllowedOrigins(List.of("http://localhost:3000"));
+    config.setAllowedOrigins(List.of("https://localhost"));
 
     // metodi consentiti
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
