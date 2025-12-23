@@ -31,8 +31,6 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT}
       TINK_KEYSET_B64: ${TINK_KEYSET_B64}
-    ports:
-      - "8080:8080"
 
   frontend:
     build:
@@ -41,8 +39,21 @@ services:
     container_name: secureauth-fe
     depends_on:
       - backend
+
+  proxy:
+    image: nginx:alpine
+    container_name: secureauth-proxy
+    depends_on:
+      - frontend
+      - backend
     ports:
-      - "3000:80"
+      - "443:443"
+    volumes:
+      - ./nginx/proxy.config:/etc/nginx/conf.d/default.conf:ro
+      - ./certs/localhost.pem:/etc/nginx/certs/localhost.pem:ro
+      - ./certs/localhost-key.pem:/etc/nginx/certs/localhost-key.pem:ro
+
+
 #creo il volume in cui saranno contenuti i dati del db
 volumes:
   dbdata:

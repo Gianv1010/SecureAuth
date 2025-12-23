@@ -30,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         User u = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        // Per ora ruolo fisso. Quando aggiungerai ruoli veri, qui li mapperai dal DB.
+        // Per ora ruolo fisso. Quando aggiungerò ruoli veri, qui li mapperò dal DB.
         List<SimpleGrantedAuthority> authorities =
                 List.of(new SimpleGrantedAuthority("ROLE_USER"));
 

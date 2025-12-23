@@ -303,3 +303,24 @@ input[type="checkbox"] {
     align-items: center;
   }
 }
+.error-text {
+  color: red;
+
+  /* dimensione fluida: cresce/diminuisce con lo schermo */
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+
+  /* migliora la leggibilità */
+  line-height: 1.4;
+
+  /* spazio sopra */
+  margin-top: 0.5rem;
+
+  /* evita sovrapposizioni */
+  display: block;
+
+  /* gestione testo lungo */
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+

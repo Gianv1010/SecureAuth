@@ -1,5 +1,6 @@
 package com.secureAuthLDC.secureAuthBE.service;
 
+import com.secureAuthLDC.secureAuthBE.dto.RegisterResponse;
 import com.secureAuthLDC.secureAuthBE.dto.RegisterScript;
 import com.secureAuthLDC.secureAuthBE.entity.User;
 import com.secureAuthLDC.secureAuthBE.repository.UserRepository;
@@ -7,6 +8,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.secureAuthLDC.secureAuthBE.security.CryptoService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import java.util.Map;
+import org.springframework.http.ResponseEntity;
 
 @Service
 public class AuthService {
@@ -14,8 +18,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TotpService totpService;
-   // private final TotpService totpService;
-    private String keySecret;
+    private String keySecret;//posso commentarlo in quanto non viene mai usata
     private CryptoService crypto;
     
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, CryptoService crypto) {
@@ -26,13 +29,18 @@ public class AuthService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String register(RegisterScript request) throws Exception {
-
+    public ResponseEntity register(RegisterScript request) throws Exception {
+    	RegisterResponse response = new RegisterResponse();
+    	if(!request.getConfirmPassword().equals(request.getPassword())) {
+    		return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Le password non coincidono"));
+    	}
+    	
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return "Questa email è già in uso";
+    		return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Questa email è già stata utilizzata"));
+
         }
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-        	return "Questo username è già in uso";
+    		return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Questo username è già stato utilizzato"));
         }
 
     	User user = new User(request.getUsername(), request.getEmail(), passwordEncoder.encode(request.getPassword()), false, "");
@@ -42,23 +50,9 @@ public class AuthService {
         	user.setEnable2FA(true);
         	user.setTotpSecret(crypto.encryptToBase64(totpService.generaSecret(), user.getId()));
         	userRepository.save(user);
-            //return "User registered successfully111";
-        	//genera totpSecret
-        	//keySecret = totpService.generaSecret();
-        	//totpService.costruisciOtpAuthUrl(keySecret, request.getEmail(), "SecureAuth");
-        	//creare keysecret e passarla al costruttore e impostare una variabile true da passare al costruttore sempre
-        	
-        }
-        //else
-        //{
-        	//User user = new User(request.getUsername(), request.getEmail(), passwordEncoder.encode(request.getPassword()), false, "");
-        	//userRepository.save(user);
-            return "User registered successfully222";
-        	//User user = new User(request.getUsername(), request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getTwoFactorEnabled());
+            }
+    	return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Utente registrato con successo"));
         }
 
-        
-        //salvo l'oggetto User nel DB
-        
     }
 

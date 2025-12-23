@@ -1,0 +1,140 @@
+/* Container principale della card (uguale al form di login) */
+.containerQrcode {
+  background-color: rgba(255, 255, 255, 0.1);
+    width: 100%;
+    max-width: 400px; /* Larghezza massima della card */
+    margin: 50px auto; /* Centra la card nella pagina */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombreggiatura leggera */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Titolo */
+.containerQrcode h2 {
+    text-align: center;
+    color: #fdfdfd;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+.containerQrcode label#secret {
+  color: green;
+}
+
+/* Etichette */
+.containerQrcode label {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    display: block;
+}
+
+/* Campi di input */
+.containerQrcode input[type="text"],
+.containerQrcode input[type="password"],
+.containerQrcode input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Assicura che il padding non sballi la larghezza */
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.containerQrcode input:focus {
+    border-color: #007bff; /* Colore blu al focus */
+    outline: none;
+}
+
+/* Bottone di invio */
+.containerQrcode input[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #646cff; /* Blu standard (puoi cambiarlo col colore del tuo amico) */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, opacity 0.3s;
+    margin-top: 10px;
+}
+
+.containerQrcode input[type="submit"]:hover {
+    background-color: #0056b3; /* Blu più scuro all'hover */
+}
+
+.containerQrcode input[type="submit"]:disabled {
+    cursor: not-allowed;
+    background-color: #ccc;
+}
+
+/* Link in basso */
+.auth-links {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.auth-links a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+/* Testo istruzioni */
+.qr-instructions {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+/* Wrapper per centrare l’immagine */
+.qr-image-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Immagine QR */
+.qr-image {
+  width: 150px;
+  height: 150px;
+  border: 1px solid #ddd;
+  padding: 5px;
+  border-radius: 8px;
+  background: white;
+  box-sizing: border-box;
+  object-fit: cover; /* se l’immagine non è quadrata */
+}
+
+.secret{
+    color: rgb(3, 141, 44);
+    padding: 0.1rem;
+}
+
+/* Input codice TOTP */
+.qr-code-input {
+  text-align: center;
+  letter-spacing: 0.3rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Bottone submit */
+.qr-submit:disabled {
+  opacity: 0.6; /* uguale al tuo inline */
+}
+.qr-submit:not(:disabled) {
+  opacity: 1;
+}

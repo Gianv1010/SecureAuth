@@ -1,19 +1,22 @@
 import { useMemo, useState } from "react"; //serve per: 1. calcolare un valore. 2.salvarlo in memoria. 3. ricalcolarlo solo quando cambiano alcune dipendenze
 import "./formRegister.css";
 import {Link} from "react-router-dom"
- function FormRegister() {
+import { useNavigate } from "react-router-dom";
 
+ function FormRegister() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   //const [password, setPassword] = useState("");
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  
+  const [errorMsg, setErrorMsg] = useState("");
   // state per l'invio del form
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
+    confirmPassword: "",
     enable2FA: false
   });
 
@@ -35,6 +38,7 @@ import {Link} from "react-router-dom"
       username: formData.username,
       email: formData.email,
       password: formData.password,
+      confirmPassword: formData.confermaPassword,
       enable2FA: formData.enable2FA
     };
 
@@ -52,6 +56,14 @@ import {Link} from "react-router-dom"
 
       const data = await response.json();
       console.log("Risposta backend:", data);
+      if (!response.ok) // <-- status 400, 401, ecc.
+      {            
+        setErrorMsg(data.message);   // <-- prendO il messaggio dal backend
+        return;
+      }
+      // SUCCESSO
+      navigate("/login");
+
     } catch (err) {
       console.error("Errore:", err);
     }
@@ -112,8 +124,9 @@ import {Link} from "react-router-dom"
             </label>
             <span className="switchLabel">2FA</span>
         </div>
-
-
+            {errorMsg !== "" ? (
+              <span className="error-text">{errorMsg}</span>
+            ) : null}
         <input type="submit" value="Registrati"></input>
         
         </form>

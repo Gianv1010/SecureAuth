@@ -4,6 +4,7 @@ import App from './App.jsx'
 import ReactDOM from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './pages/Login.jsx'
+import QRcode from './pages/QRcode.jsx'
 
 const router = createBrowserRouter([
   {
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
   {
     path: "/Login",
     element: <Login></Login>
+  },
+  {
+    path: "/qrcode",
+    element: <QRcode></QRcode>
   },
 ]);
 
