@@ -1,5 +1,7 @@
 package com.secureAuthLDC.secureAuthBE.dto;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -13,6 +15,8 @@ public class RegisterResponse {
     // presenti SOLO se enable2FA = true
     private String secret;
     private String qrCodeUri;
+    private List<String> recoveryCodes;
+
 
     // costruttore vuoto (obbligatorio per Jackson)
     public RegisterResponse() {}
@@ -31,6 +35,14 @@ public class RegisterResponse {
         this.enable2FA = enable2FA;
         this.secret = secret;
         this.qrCodeUri = qrCodeUri;
+    }
+    
+    // con RecoveryCodes
+    public RegisterResponse(boolean success, String message, boolean enable2FA, List<String> recoveryCodes) {
+        this.success = success;
+        this.message = message;
+        this.enable2FA = enable2FA;
+        this.recoveryCodes = recoveryCodes;
     }
 
     // ===== getters & setters =====
@@ -73,5 +85,12 @@ public class RegisterResponse {
 
     public void setQrCodeUri(String qrCodeUri) {
         this.qrCodeUri = qrCodeUri;
+    }
+    public List<String> getRecoveryCodes() {
+        return recoveryCodes;
+    }
+
+    public void setRecoveryCodes(String recoveryCode) {
+        recoveryCodes.add(recoveryCode);
     }
 }

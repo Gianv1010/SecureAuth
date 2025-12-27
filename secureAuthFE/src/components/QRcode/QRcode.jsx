@@ -16,9 +16,10 @@ function QRcode() {
   const qrCodeUri = location.state?.qrCodeUri ?? "";
   const email = location.state?.email ?? "";
 
+  //se non si arriva in questa pagina con i dati necessari allora si viene rendirizzati vero "/" --> pagina di registrazione
   useEffect(() => {
     if (!secret || !qrCodeUri) {
-      navigate("/register", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [secret, qrCodeUri, navigate]);
 
@@ -66,12 +67,22 @@ if (code.length !== 6) return;
       setErrorMsg(data.message ?? "Codice errato");
       return;
     }
-
+   //se il backend ha appena generato i recovery codes, vai alla pagina per mostrarli
+    if (Array.isArray(data.recoveryCodes) && data.recoveryCodes.length > 0) {
+      navigate("/recoveryCodes", {
+        state: { recoveryCodes: data.recoveryCodes, email },
+      });
+      return;
+    }
     // ok
     navigate("/welcome");
   } catch (errorMsg) {
     setErrorMsg("Errore di rete");
   }
+  };
+
+  const handleRecovery = () => {
+    navigate("/formRecovery", { state: { email } });
   };
 
   if (!secret || !qrCodeUri) return null;
@@ -135,6 +146,9 @@ if (code.length !== 6) return;
 
           <button className="qr-submit" type="submit" disabled={code.length !== 6}>
             Verifica codice
+          </button>
+          <button className="qr-recoveryCodes" type="button" onClick={handleRecovery}>
+            Voglio utilizzare codice di backup
           </button>
         </form>
 

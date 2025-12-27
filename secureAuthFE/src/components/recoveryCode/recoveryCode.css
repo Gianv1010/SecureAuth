@@ -1,0 +1,150 @@
+.rc-page{
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.rc-card{
+  width: min(900px, 100%);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  padding: 22px;
+  backdrop-filter: blur(10px);
+}
+
+.rc-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.rc-header-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.rc-header h2{
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: 0.2px;
+}
+
+.rc-sub {
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.rc-email {
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+.rc-btn{
+  border: 1px solid rgba(255,255,255,0.18);
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.05s ease, opacity 0.15s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.rc-btn:active{
+  transform: translateY(1px);
+}
+
+.rc-btn-primary{
+  background: rgba(255,255,255,0.12);
+}
+
+.rc-btn-primary:hover{
+  opacity: 0.95;
+}
+
+.rc-btn-ghost{
+  background: transparent;
+}
+
+.rc-btn-ghost:hover{
+  background: rgba(255,255,255,0.06);
+}
+
+.rc-box{
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.rc-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rc-code{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+  text-align: left;
+}
+
+.rc-code:hover{
+  background: rgba(255,255,255,0.09);
+}
+
+.rc-code-text{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.rc-code-hint{
+  opacity: 0.85;
+  font-size: 13px;
+}
+
+.rc-tip{
+  margin-top: 14px;
+  opacity: 0.9;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.rc-footer{
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* responsive */
+@media (max-width: 680px){
+  .rc-header{
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rc-btn{
+    width: 100%;
+  }
+
+  .rc-grid{
+    grid-template-columns: 1fr;
+  }
+}

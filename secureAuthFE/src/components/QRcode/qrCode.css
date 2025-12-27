@@ -159,6 +159,16 @@
   cursor: pointer;
   margin-top: 4px;
 }
+.qr-recoveryCodes {
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: #ed2f2f;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+}
 
 .qr-submit:disabled {
   opacity: 0.5;

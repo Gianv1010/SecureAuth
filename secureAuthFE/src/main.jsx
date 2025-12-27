@@ -6,6 +6,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './pages/Login.jsx'
 import QRcode from './pages/QRcode.jsx'
 import Welcome from './pages/Welcome.jsx'
+import RecoveryCode from './pages/RecoveryCodes.jsx'
+import FormRecovery from './pages/FormRecovery.jsx'
+
 
 const router = createBrowserRouter([
   {
@@ -20,7 +23,15 @@ const router = createBrowserRouter([
     path: "/qrcode",
     element: <QRcode></QRcode>
   },
-    {
+  {
+    path: "/recoveryCodes",
+    element: <RecoveryCode></RecoveryCode>
+  },
+  {
+    path: "/formRecovery",
+    element: <FormRecovery></FormRecovery>
+  },
+  {
     path: "/welcome",
     element: <Welcome></Welcome>
   },

@@ -5,5 +5,4 @@ function Qrcode() {
         <QRcode></QRcode>
     );
 }
-
 export default Qrcode;

@@ -2,7 +2,9 @@ package com.secureAuthLDC.secureAuthBE.service;
 
 import com.secureAuthLDC.secureAuthBE.dto.RegisterResponse;
 import com.secureAuthLDC.secureAuthBE.dto.RegisterScript;
+import com.secureAuthLDC.secureAuthBE.entity.RecoveryCode;
 import com.secureAuthLDC.secureAuthBE.entity.User;
+import com.secureAuthLDC.secureAuthBE.repository.RecoveryCodeRepository;
 import com.secureAuthLDC.secureAuthBE.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,21 +14,29 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import com.secureAuthLDC.secureAuthBE.dto.Verify2FARequest;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AuthService {
+
+    private final RecoveryCodeRepository recoveryCodeRepository;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TotpService totpService;
     private String keySecret;//posso commentarlo in quanto non viene mai usata
     private CryptoService crypto;
-    
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, CryptoService crypto) {
+
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, CryptoService crypto, RecoveryCodeRepository recoveryCodeRespository, RecoveryCodeRepository recoveryCodeRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         totpService = new TotpService();
         this.crypto = crypto;
+        this.recoveryCodeRepository = recoveryCodeRepository;
+        
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -112,13 +122,80 @@ public class AuthService {
         if (!ok) {
             return new RegisterResponse(false, "Codice errato o scaduto", twoFA);
         }
-
-        // se voglio aggiungere che la totp è stata verificata. Nel DB.
-        // user.setTwoFaVerified(true);
-        // userRepository.save(user);
-
+        
+        //genera recovery codes SOLO la prima volta
+        //controllo se esiste una lista di recovery code per l'utente indicato
+        if (!recoveryCodeRepository.existsByUser(user)) {
+        	//nel caso non esista genero una lista di recovery code
+            return new RegisterResponse(true, "Codice corretto, recovery code generati", twoFA, generateRecoveryCodes(user));
+        }        
         return new RegisterResponse(true, "Codice corretto", twoFA);
     }
+    
+    public List<String> generateRecoveryCodes(User user) {
+
+    	// elimina eventuali codici precedenti
+        recoveryCodeRepository.deleteByUser(user);
+        
+        //utilizzo SecureRandom e non random perchè random è prevedibile, mentre SecureRandom
+        //crea un generatore di numeri crittograficamente sicuro
+        SecureRandom random = new SecureRandom();
+        //lista che conterrà i recovery code leggibili
+        List<String> plainCodes = new ArrayList<>();//utilizzo una lista perchè piu flessibile
+        
+        //genero 10 codici
+        for (int i = 0; i < 10; i++) {
+            String code = generateSingleRecoveryCode(random);
+            String hash = passwordEncoder.encode(code); // cripto il codice
+
+            RecoveryCode rc = new RecoveryCode(user, hash);
+            recoveryCodeRepository.save(rc);
+
+            //ioinserisco i recovery code nella lista da far visualizzare al FE una sola volta
+            plainCodes.add(code);
+        }
+
+        return plainCodes; // SOLO da mostrare all’utente
+    }
+    private String generateSingleRecoveryCode(SecureRandom random) {
+    	//utilizzo questo alfabeto per creare i codici, stesso alfabeto utilizzato da google, github, AWS
+    	//permette di eliminare ogni ambiguità nella digitazione dei caratteri
+    	String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    	//Utilizzo StringBuilder perchè piu veloce nella composizione delle stringhe
+        StringBuilder sb = new StringBuilder();
+        
+        //genero il codice lungo 12 caratteri
+        for (int i = 0; i < 12; i++) {
+        	//genero un numero casuale, utilizzo il numero generato per prendere un carattere "a caso" dall'alfabeto creato prima
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+
+        return sb.toString();
+    }
+    
+    public RegisterResponse verifyRecoveryCode(String email, String code) {
+
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return new RegisterResponse(false, "Utente non trovato", false);
+        }
+
+        List<RecoveryCode> codes = recoveryCodeRepository.findByUserAndUsedFalse(user);
+
+        for (RecoveryCode rc : codes) {
+            if (passwordEncoder.matches(code, rc.getCodeHash())) {
+
+                rc.setUsed(true);
+                rc.setUsedAt(Instant.now());
+                recoveryCodeRepository.save(rc);
+
+                return new RegisterResponse(true, "Recovery code valido", false);
+            }
+        }
+
+        return new RegisterResponse(false, "Recovery code non valido", false);
+    }
+
 
     }
 

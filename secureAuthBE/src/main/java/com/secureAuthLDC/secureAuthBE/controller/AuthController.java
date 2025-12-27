@@ -1,7 +1,12 @@
 package com.secureAuthLDC.secureAuthBE.controller;
 
 import com.secureAuthLDC.secureAuthBE.dto.RegisterScript;
+import com.secureAuthLDC.secureAuthBE.entity.User;
+import com.secureAuthLDC.secureAuthBE.repository.UserRepository;
 import com.secureAuthLDC.secureAuthBE.service.AuthService;
+
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,5 +47,31 @@ public class AuthController {
         }
         return ResponseEntity.status(201).body(res);
     }
+    
+    @PostMapping("/2fa/recovery/generate")
+    public ResponseEntity<?> generateRecoveryCodes(@RequestBody String email) {
+    	UserRepository userRepository = null;
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Utente non trovato");
+        }
+
+        List<String> codes = authService.generateRecoveryCodes(user);
+        return ResponseEntity.ok(codes); // MOSTRALI UNA VOLTA SOLA
+    }
+    
+    @PostMapping("/2fa/recovery/verify")
+    public ResponseEntity<RegisterResponse> verifyRecovery(@RequestBody VerifyRecoveryCodeRequest req) {
+
+        RegisterResponse res = authService.verifyRecoveryCode(req.getEmail(), req.getRecoveryCode());
+
+        if (res.isSuccess()) {
+            return ResponseEntity.ok(res);
+        }
+
+        return ResponseEntity.status(401).body(res);
+    }
+
+
     	 
 }
