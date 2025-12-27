@@ -28,4 +28,9 @@ public class TotpService {
                 + "?secret=" + secret
                 + "&issuer=" + encIssuer;
     }
+    
+    // metodo per verificare il totp inserito da frontend
+    public boolean verifyCode(String base32Secret, int code) {
+        return ga.authorize(base32Secret, code);
+    }
 }

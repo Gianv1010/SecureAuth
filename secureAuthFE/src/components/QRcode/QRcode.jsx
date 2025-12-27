@@ -4,6 +4,8 @@ import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useMemo, useState } from "react";
 
 function QRcode() {
+  const [errorMsg, setErrorMsg] = useState("");
+
   const [code, setCode] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -41,12 +43,35 @@ function QRcode() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (code.length !== 6) return;
+if (code.length !== 6) return;
 
-    // TODO: chiama backend /api/auth/2fa/verify
-    alert("Codice inviato correttamente: " + code);
+  try {
+    const response = await fetch("/api/auth/2fa/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!data) {
+      setErrorMsg("Risposta non valida dal server");
+      return;
+    }
+
+    if (!response.ok || !data.success) {
+      setErrorMsg(data.message ?? "Codice errato");
+      return;
+    }
+
+    // ok
+    navigate("/welcome");
+  } catch (errorMsg) {
+    setErrorMsg("Errore di rete");
+  }
   };
 
   if (!secret || !qrCodeUri) return null;

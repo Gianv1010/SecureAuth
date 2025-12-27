@@ -30,7 +30,17 @@ public class AuthController {
 			e.printStackTrace();
 	        return ResponseEntity.status(500).body(new RegisterResponse(false, "Errore interno", false));			
 	     }//qui request è un oggetto perchè grazie a @RequestBody il json viene convertito in un oggetto di tipo RegisterScript ed esegue i setter in automatico.
-		
+    }
+    
+    @PostMapping("/2fa/verify")
+    public ResponseEntity<RegisterResponse> verify2FA(@RequestBody Verify2FARequest request) {
+        RegisterResponse res = authService.verify2FA(request);
+
+        if (!res.isSuccess()) {
+            // 401 per codice sbagliato, oppure 400 se preferisci
+            return ResponseEntity.status(401).body(res);
+        }
+        return ResponseEntity.status(201).body(res);
     }
     	 
 }
