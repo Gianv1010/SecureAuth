@@ -2,6 +2,10 @@ package com.secureAuthLDC.secureAuthBE.service;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,8 +19,13 @@ public class TotpService {
 
     //metodo che serve per costuire una url che serve all'app google authenticator in questo caso per passare il secret
     public String costruisciOtpAuthUrl(String nomeApp, String email, String secret) {
-        // formato standard per app Authenticator
-        return "otpauth://totp/" + nomeApp + ":" + email +
-               "?secret=" + secret + "&issuer=" + nomeApp;
+        String encIssuer = URLEncoder.encode(nomeApp, StandardCharsets.UTF_8);
+        String encEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
+
+        String label = encIssuer + ":" + encEmail;
+
+        return "otpauth://totp/" + label
+                + "?secret=" + secret
+                + "&issuer=" + encIssuer;
     }
 }

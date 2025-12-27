@@ -44,28 +44,46 @@ import { useNavigate } from "react-router-dom";
 
     console.log("JSON inviato:", payload);
 
-    // esempio fetch
-    try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+   try {
+  const response = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-      const data = await response.json();
-      console.log("Risposta backend:", data);
-      if (!response.ok) // <-- status 400, 401, ecc.
-      {            
-        setErrorMsg(data.message);   // <-- prendO il messaggio dal backend
-        return;
-      }
-      // SUCCESSO
-      navigate("/login");
+  // prova a leggere JSON, ma senza far crashare se non è JSON
+const data = await response.json().catch(() => null);
+if (!data) {
+  setErrorMsg("Risposta non valida dal server");
+  return;
+}
+if (!data.success) {
+  setErrorMsg(data.message ?? "Errore durante la registrazione");
+  return;
+}
+if (!response.ok) {
+  setErrorMsg(data?.message ?? "Errore durante la registrazione");
+  return;
+}
 
-    } catch (err) {
-      console.error("Errore:", err);
-    }
+  // SUCCESSO
+  // data è il tuo RegisterResponse DTO
+  if (data.enable2FA) {
+    navigate("/qrcode", {
+      state: {
+        secret: data.secret,
+        qrCodeUri: data.qrCodeUri,
+        email: payload.email, // opzionale, se ti serve dopo
+      },
+    });
+  } else {
+    navigate("/login");
   }
+} catch (err) {
+  console.error("Errore:", err);
+  setErrorMsg("Errore di rete");
+}
+}
 
     // Requisiti password
   const checks = useMemo(() => { 

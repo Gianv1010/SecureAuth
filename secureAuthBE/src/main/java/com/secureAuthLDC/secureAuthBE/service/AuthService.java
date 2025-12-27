@@ -29,29 +29,39 @@ public class AuthService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity register(RegisterScript request) throws Exception {
-    	RegisterResponse response = new RegisterResponse();
+    public RegisterResponse register(RegisterScript request) throws Exception {
+    	RegisterResponse response;
     	if(!request.getConfirmPassword().equals(request.getPassword())) {
-    		return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Le password non coincidono"));
+    		return new RegisterResponse(false, "Le password non coincidono", false);
+    		//return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Le password non coincidono"));
     	}
     	
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-    		return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Questa email è già stata utilizzata"));
+    		return new RegisterResponse(false, "Questa email è già stata utilizzata", false);
+        	//return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Questa email è già stata utilizzata"));
 
         }
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-    		return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Questo username è già stato utilizzato"));
+    		return new RegisterResponse(false, "Questo username è già stato utilizzato", false);
+        	//return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Questo username è già stato utilizzato"));
         }
 
     	User user = new User(request.getUsername(), request.getEmail(), passwordEncoder.encode(request.getPassword()), false, "");
     	userRepository.save(user);
 
     	if(request.getEnable2FA()==true) {
+    		String secret, uriSecret;
+    		secret = totpService.generaSecret();
+    		uriSecret = totpService.costruisciOtpAuthUrl("SecureAuth", request.getEmail(), secret);
+    		
         	user.setEnable2FA(true);
-        	user.setTotpSecret(crypto.encryptToBase64(totpService.generaSecret(), user.getId()));
+        	user.setTotpSecret(crypto.encryptToBase64(secret, user.getId()));
         	userRepository.save(user);
+    		return new RegisterResponse(true, "Utente registrato con successo con 2FA", true, secret, uriSecret);
             }
-    	return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Utente registrato con successo"));
+		return new RegisterResponse(true, "Utente registrato con successo", false);
+
+    	//return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Utente registrato con successo"));
         }
 
     }

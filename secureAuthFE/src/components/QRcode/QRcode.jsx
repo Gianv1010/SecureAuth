@@ -1,60 +1,124 @@
-import {useState} from "react";
-import "./qrCode.css"
-import qrcodeImage from "../../assets/paulo-dybala.png"
-import { Link } from "react-router-dom";
+import "./qrCode.css";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
+import { useEffect, useMemo, useState } from "react";
 
 function QRcode() {
+  const [code, setCode] = useState("");
+  const [copied, setCopied] = useState(false);
 
-    const [code, setCode] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        const val = e.target.value;
-        // Regex 
-        // ^ --> inizio stringa
-        // \d --> solo numeri da 0 a 9
-        // * --> zero o piu cifre
-        // $ --> fine stringa
-        if (/^\d*$/.test(val)) {
-            // deve essere per forza uguale a 6
-            if (val.length <= 6) {
-                setCode(val);
-            }
-        }
-    };  
-    
-    const handleSubmit = (e) => {
-        e.preventDefault(); // Evita che la pagina si ricarichi
-        if (code.length === 6) {
-            alert("Codice inviato correttamente: " + code);
-        } else {
-            alert("Il codice deve essere di 6 cifre.");
-        }
-    };
-    return (
-        <>
-            <div className='containerQrcode'>
-                <h2>Scansiona QR code</h2>
-                
-                {/* Contenitore per centrare l'immagine */}
-                <div className="qr-image-wrapper">
-                    <img src={qrcodeImage} alt="QR Code" className="qr-image" />
-                </div>
+  const secret = location.state?.secret ?? "";
+  const qrCodeUri = location.state?.qrCodeUri ?? "";
+  const email = location.state?.email ?? "";
 
-                <form onSubmit={handleSubmit}>
-                    <label>Codice di verifica</label>
-                    <input type="text" name="totpCode" placeholder="000 000" value={code} onChange={handleChange} maxLength={6} inputMode="numeric" className="qr-code-input" required/>
-                    <label className="secret" id="secret">secret</label>
+  useEffect(() => {
+    if (!secret || !qrCodeUri) {
+      navigate("/register", { replace: true });
+    }
+  }, [secret, qrCodeUri, navigate]);
 
-                    <input className="qr-submit" type="submit" value="Verifica Codice" disabled={code.length !== 6}/>
-                </form>
+  const qrSize = useMemo(() => {
+    // dimensione QR “sicura” per GA: non scendere troppo
+    // puoi aumentare se vuoi (es. 440)
+    return 380;
+  }, []);
 
-                <div className="auth-links">
-                    <Link to="/login">Torna al Login</Link>
-                </div>
+  const handleChange = (e) => {
+    const val = e.target.value;
+    if (/^\d*$/.test(val) && val.length <= 6) setCode(val);
+  };
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(secret);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {
+      // fallback: niente
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (code.length !== 6) return;
+
+    // TODO: chiama backend /api/auth/2fa/verify
+    alert("Codice inviato correttamente: " + code);
+  };
+
+  if (!secret || !qrCodeUri) return null;
+
+  return (
+    <div className="qr-page">
+      <div className="qr-card">
+        <h2 className="qr-title">Scansiona il QR code</h2>
+
+        {email ? <p className="qr-subtitle">Account: <b>{email}</b></p> : null}
+
+        {/* QR in un box dedicato, NON dentro al form */}
+        <div className="qr-box" aria-label="QR Code">
+          <div className="qr-box-inner">
+            <QRCodeSVG
+              value={qrCodeUri}
+              size={qrSize}
+              includeMargin
+              bgColor="#ffffff"
+              fgColor="#000000"
+              level="L"
+            />
+          </div>
+          <p className="qr-hint">
+            Apri Google Authenticator → <b>+</b> → <b>Scansiona un codice QR</b>
+          </p>
+        </div>
+
+        {/* Form sotto, separato: non deve comprimere il QR */}
+        <form className="qr-form" onSubmit={handleSubmit}>
+          <label className="qr-label" htmlFor="totpCode">Codice di verifica</label>
+
+          <input
+            id="totpCode"
+            type="text"
+            name="totpCode"
+            placeholder="000000"
+            value={code}
+            onChange={handleChange}
+            maxLength={6}
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            className="qr-input"
+            required
+          />
+
+          <div className="secret-row">
+            <div className="secret-block">
+              <code className="secret-value">{secret}</code>
             </div>
-        </>
-    );
+
+            <button
+              type="button"
+              className="copy-btn"
+              onClick={handleCopy}
+              title="Copia la secret"
+            >
+              {copied ? "Copiata" : "Copia"}
+            </button>
+          </div>
+
+          <button className="qr-submit" type="submit" disabled={code.length !== 6}>
+            Verifica codice
+          </button>
+        </form>
+
+        <div className="qr-links">
+          <Link className="qr-link" to="/login">Torna al Login</Link>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default QRcode;
