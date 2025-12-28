@@ -25,7 +25,6 @@ export default function FormRecovery() {
   }, [recoveryCode]);
 
   // Codici tipo: 12 caratteri (es: A1B2C3D4E5F6)
-  // Se i tuoi sono diversi, cambia questa regex
   const isValidFormat = useMemo(() => {
     return /^[A-Z0-9]{12}$/.test(normalized);
   }, [normalized]);
@@ -53,7 +52,7 @@ export default function FormRecovery() {
       const response = await fetch("/api/auth/2fa/recovery/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code: normalized }), // è come scrivere email: "email" 
+        body: JSON.stringify({ email, recoveryCode: normalized }), // è come scrivere email: "email" 
                                                                             //code: "codiceNormalizzato" --> sintassi chiave valore --> per JSON
       });
 
@@ -69,7 +68,6 @@ export default function FormRecovery() {
         return;
       }
 
-      // OK: login completato
       navigate("/welcome");
     } catch (err) {
       console.error(err);
@@ -108,7 +106,7 @@ export default function FormRecovery() {
             onChange={handleChange}
             autoComplete="one-time-code"
             className={`fr-input ${errorMsg ? "fr-input-error" : ""}`}
-            maxLength={24} // permette spazi, poi li togliamo
+            maxLength={24} 
             inputMode="text"
             required
           />
