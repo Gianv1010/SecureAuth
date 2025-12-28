@@ -45,7 +45,7 @@ public class RegisterResponse {
         this.recoveryCodes = recoveryCodes;
     }
 
-    // ===== getters & setters =====
+    // getters e setters
 
     public boolean isSuccess() {
         return success;
@@ -93,4 +93,5 @@ public class RegisterResponse {
     public void setRecoveryCodes(String recoveryCode) {
         recoveryCodes.add(recoveryCode);
     }
+    
 }

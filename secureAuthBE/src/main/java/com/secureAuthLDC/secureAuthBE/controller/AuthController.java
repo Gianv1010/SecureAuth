@@ -42,7 +42,7 @@ public class AuthController {
         RegisterResponse res = authService.verify2FA(request);
 
         if (!res.isSuccess()) {
-            // 401 per codice sbagliato, oppure 400 se preferisci
+            // 401 per codice sbagliato
             return ResponseEntity.status(401).body(res);
         }
         return ResponseEntity.status(201).body(res);
