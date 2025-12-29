@@ -87,9 +87,7 @@ export default function FormRecovery() {
           <p className="fr-subtitle">
             Usa uno dei codici di backup generati durante l’attivazione della 2FA.
           </p>
-          <p className="fr-email">
-            Account: <b>{email}</b>
-          </p>
+
         </div>
 
         <form className="fr-form" onSubmit={handleSubmit}>

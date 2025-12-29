@@ -8,7 +8,7 @@ import QRcode from './pages/QRcode.jsx'
 import Welcome from './pages/Welcome.jsx'
 import RecoveryCode from './pages/RecoveryCodes.jsx'
 import FormRecovery from './pages/FormRecovery.jsx'
-
+import TotpCode from './pages/totp.jsx'
 
 const router = createBrowserRouter([
   {
@@ -16,12 +16,16 @@ const router = createBrowserRouter([
     element: <App></App>
   },
   {
-    path: "/Login",
+    path: "/login",
     element: <Login></Login>
   },
   {
     path: "/qrcode",
     element: <QRcode></QRcode>
+  },
+  {
+    path: "/totp",
+    element: <TotpCode></TotpCode>
   },
   {
     path: "/recoveryCodes",

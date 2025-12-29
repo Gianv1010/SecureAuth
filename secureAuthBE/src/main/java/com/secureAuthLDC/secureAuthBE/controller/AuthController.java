@@ -37,6 +37,16 @@ public class AuthController {
 	     }//qui request è un oggetto perchè grazie a @RequestBody il json viene convertito in un oggetto di tipo RegisterScript ed esegue i setter in automatico.
     }
     
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody LoginScript request) {
+        LoginResponse res = authService.login(request);
+        if (!res.isSuccess()) {
+            return ResponseEntity.status(401).body(res);
+        }
+        return ResponseEntity.ok(res);
+    }
+
+    
     @PostMapping("/2fa/verify")
     public ResponseEntity<RegisterResponse> verify2FA(@RequestBody Verify2FARequest request) {
         RegisterResponse res = authService.verify2FA(request);

@@ -18,6 +18,8 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import com.secureAuthLDC.secureAuthBE.dto.LoginResponse;
+import com.secureAuthLDC.secureAuthBE.dto.LoginScript;
 
 @Service
 public class AuthService {
@@ -74,6 +76,32 @@ public class AuthService {
 
     	//return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Utente registrato con successo"));
         }
+    // ******METODO PER LOGIN******
+    public LoginResponse login(LoginScript req) {
+        if (req == null || req.getEmail() == null || req.getPassword() == null) {
+            return new LoginResponse(false, "Dati mancanti", false);
+        }
+
+        String email = req.getEmail().trim();
+        String password = req.getPassword();
+
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return new LoginResponse(false, "Credenziali non valide", false);
+        }
+
+        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+            return new LoginResponse(false, "Credenziali non valide", false);
+        }
+
+        // se 2FA attiva -> FE deve andare alla pagina TOTP
+        if (user.getEnable2FA()) {
+            return new LoginResponse(true, "Inserisci il codice 2FA", true);
+        }
+
+        // login completato (qui in futuro emetterai token/sessione)
+        return new LoginResponse(true, "Login completato", false);
+    }
     
     //metodo che verifica che il codice totp inserito è corretto
     public RegisterResponse verify2FA(Verify2FARequest req) {

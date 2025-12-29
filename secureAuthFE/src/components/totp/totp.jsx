@@ -1,54 +1,30 @@
-import "./qrCode.css";
+import "./totp.css"
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
 function QRcode() {
   const [errorMsg, setErrorMsg] = useState("");
 
   const [code, setCode] = useState("");
-  const [copied, setCopied] = useState(false);
-
   const location = useLocation();
   const navigate = useNavigate();
-
-  const secret = location.state?.secret ?? "";
-  const qrCodeUri = location.state?.qrCodeUri ?? "";
   const email = location.state?.email ?? "";
 
   //se non si arriva in questa pagina con i dati necessari allora si viene rendirizzati vero "/" --> pagina di registrazione
-  useEffect(() => {
+ /* useEffect(() => {
     if (!secret || !qrCodeUri) {
       navigate("/", { replace: true });
     }
-  }, [secret, qrCodeUri, navigate]);
-
-  const qrSize = useMemo(() => {
-    // dimensione QR “sicura” per GA: non scendere troppo
-    // puoi aumentare se vuoi (es. 440)
-    return 380;
-  }, []);
+  }, [secret, qrCodeUri, navigate]);*/
 
   const handleChange = (e) => {
     const val = e.target.value;
     if (/^\d*$/.test(val) && val.length <= 6) setCode(val);
   };
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(secret);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1200);
-    } catch {
-      // fallback: niente
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (code.length !== 6) return;
-if (code.length !== 6) return;
-
   try {
     const response = await fetch("/api/auth/2fa/verify", {
       method: "POST",
@@ -67,13 +43,6 @@ if (code.length !== 6) return;
       setErrorMsg(data.message ?? "Codice errato");
       return;
     }
-   //se il backend ha appena generato i recovery codes, vai alla pagina per mostrarli
-    if (Array.isArray(data.recoveryCodes) && data.recoveryCodes.length > 0) {
-      navigate("/recoveryCodes", {
-        state: { recoveryCodes: data.recoveryCodes, email },
-      });
-      return;
-    }
     // ok
     navigate("/welcome");
   } catch (errorMsg) {
@@ -81,29 +50,13 @@ if (code.length !== 6) return;
   }
   };
 
-  if (!secret || !qrCodeUri) return null;
-
+  const handleRecovery = () => {
+    navigate("/formRecovery", { state: { email } });
+  };
   return (
     <div className="qr-page">
       <div className="qr-card">
         <h2 className="qr-title">Scansiona il QR code</h2>
-        {/* QR in un box dedicato, NON dentro al form */}
-        <div className="qr-box" aria-label="QR Code">
-          <div className="qr-box-inner">
-            <QRCodeSVG
-              value={qrCodeUri}
-              size={qrSize}
-              includeMargin
-              bgColor="#ffffff"
-              fgColor="#000000"
-              level="L"
-            />
-          </div>
-          <p className="qr-hint">
-            Apri Google Authenticator → <b>+</b> → <b>Scansiona un codice QR</b>
-          </p>
-        </div>
-
         {/* Form sotto, separato: non deve comprimere il QR */}
         <form className="qr-form" onSubmit={handleSubmit}>
           <label className="qr-label" htmlFor="totpCode">Codice di verifica</label>
@@ -122,23 +75,12 @@ if (code.length !== 6) return;
             required
           />
 
-          <div className="secret-row">
-            <div className="secret-block">
-              <code className="secret-value">{secret}</code>
-            </div>
-
-            <button
-              type="button"
-              className="copy-btn"
-              onClick={handleCopy}
-              title="Copia la secret"
-            >
-              {copied ? "Copiata" : "Copia"}
-            </button>
-          </div>
 
           <button className="qr-submit" type="submit" disabled={code.length !== 6}>
             Verifica codice
+          </button>
+          <button className="qr-recoveryCodes" type="button" onClick={handleRecovery}>
+            Voglio utilizzare codice di backup
           </button>
         </form>
 
