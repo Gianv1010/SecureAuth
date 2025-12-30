@@ -4,13 +4,15 @@ import com.secureAuthLDC.secureAuthBE.dto.RegisterScript;
 import com.secureAuthLDC.secureAuthBE.entity.User;
 import com.secureAuthLDC.secureAuthBE.repository.UserRepository;
 import com.secureAuthLDC.secureAuthBE.service.AuthService;
-
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.secureAuthLDC.secureAuthBE.dto.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.secureAuthLDC.secureAuthBE.dto.ForgotPasswordRequest;
+import com.secureAuthLDC.secureAuthBE.dto.GenericResponse;
+import com.secureAuthLDC.secureAuthBE.dto.ResetPasswordRequest;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -58,18 +60,6 @@ public class AuthController {
         return ResponseEntity.status(201).body(res);
     }
     
-    @PostMapping("/2fa/recovery/generate")
-    public ResponseEntity<?> generateRecoveryCodes(@RequestBody String email) {
-    	UserRepository userRepository = null;
-        User user = userRepository.findByEmail(email).orElse(null);
-        if (user == null) {
-            return ResponseEntity.badRequest().body("Utente non trovato");
-        }
-
-        List<String> codes = authService.generateRecoveryCodes(user);
-        return ResponseEntity.ok(codes); // MOSTRALI UNA VOLTA SOLA
-    }
-    
     @PostMapping("/2fa/recovery/verify")
     public ResponseEntity<RegisterResponse> verifyRecovery(@RequestBody VerifyRecoveryCodeRequest req) {
 
@@ -82,6 +72,38 @@ public class AuthController {
         return ResponseEntity.status(401).body(res);
     }
 
+    
+    
+    
+    
+
+
+        @PostMapping("/forgot")
+        public ResponseEntity<GenericResponse> forgot(@RequestBody ForgotPasswordRequest req) {
+            // In dev: il tuo frontend sta su https://localhost
+            // In produzione: mettilo in application.properties
+        	System.out.println(">>>>>>>>>>>>>>> HIT /api/auth/forgot: " + req.getEmail());
+            String appBaseUrl = "https://localhost";
+            System.out.println(">>>>>>>>>>>>>>>> BEFORE service call");
+
+            GenericResponse res = authService.forgotPassword(req.getEmail(), appBaseUrl);
+            System.out.println(">>>>>>>>>>>>>>>>>>>>> AFTER service call, returning 200");
+
+            return ResponseEntity.status(201).body(res);
+        }
+
+        @PostMapping("/reset")
+        public ResponseEntity<GenericResponse> reset(@RequestBody ResetPasswordRequest req) {
+            System.out.println(">>>>>>>>>>>>>>>>>>>>> TOKEN:" + req.getToken());
+
+            GenericResponse res = authService.resetPassword(req.getToken(), req.getNewPassword(), req.getConfirmPassword());
+
+            if (!res.isSuccess()) {
+                return ResponseEntity.status(400).body(res);
+            }
+            return ResponseEntity.ok(res);
+        }
+    }
 
     	 
-}
+

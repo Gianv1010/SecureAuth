@@ -52,7 +52,8 @@ public class SecurityConfig {
 
     // in dev: consenti il frontend locale
     config.setAllowedOrigins(List.of("https://localhost"));
-
+    // Consenti localhost con qualsiasi porta (Vite, Nginx, ecc.)
+    //config.setAllowedOriginPatterns(List.of("https://localhost:*", "http://localhost:*"));
     // metodi consentiti
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 

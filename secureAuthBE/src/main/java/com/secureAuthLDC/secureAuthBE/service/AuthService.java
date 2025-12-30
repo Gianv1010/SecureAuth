@@ -2,8 +2,10 @@ package com.secureAuthLDC.secureAuthBE.service;
 
 import com.secureAuthLDC.secureAuthBE.dto.RegisterResponse;
 import com.secureAuthLDC.secureAuthBE.dto.RegisterScript;
+import com.secureAuthLDC.secureAuthBE.entity.PasswordResetToken;
 import com.secureAuthLDC.secureAuthBE.entity.RecoveryCode;
 import com.secureAuthLDC.secureAuthBE.entity.User;
+import com.secureAuthLDC.secureAuthBE.repository.PasswordResetTokenRepository;
 import com.secureAuthLDC.secureAuthBE.repository.RecoveryCodeRepository;
 import com.secureAuthLDC.secureAuthBE.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,8 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.secureAuthLDC.secureAuthBE.dto.GenericResponse;
 import com.secureAuthLDC.secureAuthBE.dto.LoginResponse;
 import com.secureAuthLDC.secureAuthBE.dto.LoginScript;
 
@@ -25,20 +29,22 @@ import com.secureAuthLDC.secureAuthBE.dto.LoginScript;
 public class AuthService {
 
     private final RecoveryCodeRepository recoveryCodeRepository;
-
+    private final PasswordResetTokenRepository prtr;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TotpService totpService;
     private String keySecret;//posso commentarlo in quanto non viene mai usata
     private CryptoService crypto;
+    private EmailService emailService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, CryptoService crypto, RecoveryCodeRepository recoveryCodeRespository, RecoveryCodeRepository recoveryCodeRepository) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, CryptoService crypto, RecoveryCodeRepository recoveryCodeRespository, RecoveryCodeRepository recoveryCodeRepository,PasswordResetTokenRepository prtr, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         totpService = new TotpService();
         this.crypto = crypto;
         this.recoveryCodeRepository = recoveryCodeRepository;
-        
+        this.prtr = prtr;
+        this.emailService = emailService;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -222,6 +228,101 @@ public class AuthService {
         }
 
         return new RegisterResponse(false, "Recovery code non valido", false);
+    }
+
+    
+    
+    
+    
+    
+    @Transactional // serve per dire al backend che questo metodo è atomico o avviene tutto o niente
+    public GenericResponse forgotPassword(String email, String appBaseUrl) {
+        // Risposta sempre uguale (anti enumeration)
+        GenericResponse generic = new GenericResponse(true,
+            "Se l'email è registrata, ti abbiamo inviato un link per reimpostare la password.");
+
+        if (email == null || email.isBlank()) return generic;
+        
+        //normalizzo l'email
+        String normalizedEmail = email.trim().toLowerCase();
+        //controllo se l'email esiste nel DB
+        User user = userRepository.findByEmail(normalizedEmail).orElse(null);
+        if (user == null) return generic;
+
+        // invalida eventuali vecchi token
+        prtr.deleteByUser(user);
+        
+        //genera token e lo crittografa
+        String tokenPlain = generateResetToken();
+        String tokenHash = sha256Base64Url(tokenPlain);
+        
+        //tempo di duarata del token, a partire da questo momento * 15 minuti
+        java.time.Instant expiresAt = java.time.Instant.now().plus(15, java.time.temporal.ChronoUnit.MINUTES);
+
+        PasswordResetToken token = new PasswordResetToken(user, tokenHash, expiresAt);
+        prtr.save(token);
+        
+        //creo link da inviare tramite email
+        String resetLink = appBaseUrl + "/resetPassword?token=" + tokenPlain;
+
+        emailService.sendPasswordResetEmail(normalizedEmail, resetLink);
+
+        return generic;
+    }
+
+    
+    
+    @Transactional
+    public GenericResponse resetPassword(String tokenPlain, String newPassword, String confirmPassword) {
+        if (tokenPlain == null || tokenPlain.isBlank()) {
+            return new GenericResponse(false, "Token mancante o non valido.");
+        }
+        if (newPassword == null || confirmPassword == null || newPassword.isBlank()) {
+            return new GenericResponse(false, "Password mancante.");
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            return new GenericResponse(false, "Le password non coincidono.");
+        }
+
+        String tokenHash = sha256Base64Url(tokenPlain.trim());
+
+        PasswordResetToken prt = prtr.findByTokenHashAndConsumedFalse(tokenHash).orElse(null);
+
+        if (prt == null) {
+            return new GenericResponse(false, "Token non valido o già usato.");
+        }
+        if (prt.isExpired()) {
+            return new GenericResponse(false, "Token scaduto. Richiedi un nuovo reset.");
+        }
+
+        User user = prt.getUser();
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        prt.setConsumed(true);
+        prt.setConsumedAt(java.time.Instant.now());
+        prtr.save(prt);
+
+        return new GenericResponse(true, "Password aggiornata con successo. Ora puoi fare login.");
+    }
+
+    
+    
+    
+    private String generateResetToken() {
+        byte[] bytes = new byte[32];
+        new java.security.SecureRandom().nextBytes(bytes);
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private String sha256Base64Url(String input) {
+        try {
+            var md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] dig = md.digest(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(dig);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

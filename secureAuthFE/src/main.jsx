@@ -9,6 +9,8 @@ import Welcome from './pages/Welcome.jsx'
 import RecoveryCode from './pages/RecoveryCodes.jsx'
 import FormRecovery from './pages/FormRecovery.jsx'
 import TotpCode from './pages/totp.jsx'
+import FormEmail from './pages/Email.jsx'
+import FormResetPassword from './pages/FormResetPassword.jsx';
 
 const router = createBrowserRouter([
   {
@@ -34,6 +36,14 @@ const router = createBrowserRouter([
   {
     path: "/formRecovery",
     element: <FormRecovery></FormRecovery>
+  },
+  {
+    path: "/formEmail",
+    element: <FormEmail></FormEmail>
+  },
+  {
+    path: "/resetPassword",
+    element: <FormResetPassword></FormResetPassword>
   },
   {
     path: "/welcome",

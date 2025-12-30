@@ -1,15 +1,12 @@
 import { useState } from "react";
 import "../FormRegister/formRegister.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link} from "react-router-dom";
 
-export default function FormLogin() {
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
+export default function FormEmail() {
   const [errorMsg, setErrorMsg] = useState("");
 
     const [formData, setFormData] = useState({
     email: "",
-    password: ""
   });
 
    function handleChange(e) {
@@ -28,13 +25,12 @@ export default function FormLogin() {
       //JSON da mandare al backend
       const payload = {
         email: formData.email,
-        password: formData.password
       };
   
       console.log("JSON inviato:", payload);
   
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/forgot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -47,18 +43,13 @@ export default function FormLogin() {
     return;
   }
   if (!data.success) {
-    setErrorMsg(data.message ?? "Errore durante la registrazione");
+    setErrorMsg(data.message ?? "Errore");
     return;
   }
   if (!response.ok) {
-    setErrorMsg(data?.message ?? "Errore durante la registrazione");
+    setErrorMsg(data?.message ?? "Errore");
     return;
   }
-    if (data.enable2FA) {
-      navigate("/totp", {state: {email : formData.email}});
-    } else {
-      navigate("/welcome");
-    }
   } catch (err) {
     console.error("Errore:", err);
     setErrorMsg("Errore di rete");
@@ -79,32 +70,8 @@ export default function FormLogin() {
           onChange={handleChange}
           required
         />
-
-        <label className="labelRow">
-          Password
-          <span className="eye" onClick={() => setShowPassword(!showPassword)}>
-            {showPassword ? "🙊" : "🙈"}
-          </span>
-        </label>
-
-        <input
-          type={showPassword ? "text" : "password"}
-          name="password"
-          placeholder="Password..."
-          minLength={8}
-          maxLength={256}
-          onChange={handleChange}
-          required
-        />
-
         {errorMsg ? <span className="error-text">{errorMsg}</span> : null}
-
         <input type="submit" value="accedi"/>
-
-        <div className="auth-links">
-          <Link to="/">Non ho un account</Link>
-          <Link to="/formEmail">Password dimenticata</Link>
-        </div>
       </form>
     </div>
   );

@@ -15,10 +15,24 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+          mail:
+            smtp:
+              auth: true
+              starttls:
+               enable: true
+          debug: true   # opzionale, utile in sviluppo					
 security:
   jwt:
     secret: ${JWT_SECRET}
     expiration-minutes: ${SECURITY_JWT_EXPIRATION_MINUTES}
   tink:
     keyset-b64: ${TINK_KEYSET_B64}
+app:
+  mail:
+    from: ${MAIL_USERNAME}
