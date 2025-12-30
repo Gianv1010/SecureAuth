@@ -10,13 +10,6 @@ function QRcode() {
   const navigate = useNavigate();
   const email = location.state?.email ?? "";
 
-  //se non si arriva in questa pagina con i dati necessari allora si viene rendirizzati vero "/" --> pagina di registrazione
- /* useEffect(() => {
-    if (!secret || !qrCodeUri) {
-      navigate("/", { replace: true });
-    }
-  }, [secret, qrCodeUri, navigate]);*/
-
   const handleChange = (e) => {
     const val = e.target.value;
     if (/^\d*$/.test(val) && val.length <= 6) setCode(val);

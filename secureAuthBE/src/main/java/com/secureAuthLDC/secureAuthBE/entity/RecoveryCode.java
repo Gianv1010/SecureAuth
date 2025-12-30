@@ -10,7 +10,7 @@ public class RecoveryCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)//genera autonomamente la PK
     private Long id; //PK
-  //ManyToOne--> indica che ci sono piu recovery code per un untente
+    //ManyToOne--> indica che ci sono piu recovery code per un untente
     //optionale=false serve per dire che un recovery code deve avere un utente associato
     @ManyToOne(optional = false)
     // FK

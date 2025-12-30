@@ -1,15 +1,10 @@
 package com.secureAuthLDC.secureAuthBE.controller;
 
 import com.secureAuthLDC.secureAuthBE.dto.RegisterScript;
-import com.secureAuthLDC.secureAuthBE.entity.User;
-import com.secureAuthLDC.secureAuthBE.repository.UserRepository;
 import com.secureAuthLDC.secureAuthBE.service.AuthService;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.secureAuthLDC.secureAuthBE.dto.*;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import com.secureAuthLDC.secureAuthBE.dto.ForgotPasswordRequest;
 import com.secureAuthLDC.secureAuthBE.dto.GenericResponse;
 import com.secureAuthLDC.secureAuthBE.dto.ResetPasswordRequest;
@@ -48,7 +43,6 @@ public class AuthController {
         return ResponseEntity.ok(res);
     }
 
-    
     @PostMapping("/2fa/verify")
     public ResponseEntity<RegisterResponse> verify2FA(@RequestBody Verify2FARequest request) {
         RegisterResponse res = authService.verify2FA(request);

@@ -4,6 +4,7 @@ public class VerifyRecoveryCodeRequest {
     private String email;
     private String recoveryCode;
     
+    // getter/setter
 	public String getEmail() {
 		return email;
 	}
@@ -17,7 +18,7 @@ public class VerifyRecoveryCodeRequest {
 		this.recoveryCode = recoveryCode;
 	}
 
-    // getter/setter
+ 
     
 }
 

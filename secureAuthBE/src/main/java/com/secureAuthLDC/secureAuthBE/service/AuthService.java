@@ -14,15 +14,11 @@ import org.springframework.stereotype.Service;
 import com.secureAuthLDC.secureAuthBE.security.CryptoService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import java.util.Map;
-import org.springframework.http.ResponseEntity;
 import com.secureAuthLDC.secureAuthBE.dto.Verify2FARequest;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import com.google.api.client.util.Value;
 import com.secureAuthLDC.secureAuthBE.dto.GenericResponse;
 import com.secureAuthLDC.secureAuthBE.dto.LoginResponse;
 import com.secureAuthLDC.secureAuthBE.dto.LoginScript;
@@ -37,7 +33,6 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TotpService totpService;
-    private String keySecret;//posso commentarlo in quanto non viene mai usata
     private CryptoService crypto;
     private EmailService emailService;
     private final PasswordHistoryRepository passwordHistoryRepository;
@@ -57,7 +52,6 @@ public class AuthService {
 
     @Transactional(rollbackFor = Exception.class)
     public RegisterResponse register(RegisterScript request) throws Exception {
-    	RegisterResponse response;
     	if(!request.getConfirmPassword().equals(request.getPassword())) {
     		return new RegisterResponse(false, "Le password non coincidono", false);
     		//return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Le password non coincidono"));
@@ -238,11 +232,6 @@ public class AuthService {
         return new RegisterResponse(false, "Recovery code non valido", false);
     }
 
-    
-    
-    
-    
-    
     @Transactional // serve per dire al backend che questo metodo è atomico o avviene tutto o niente
     public GenericResponse forgotPassword(String email, String appBaseUrl) {
         // Risposta sempre uguale (anti enumeration)

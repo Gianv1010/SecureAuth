@@ -1,7 +1,7 @@
 package com.secureAuthLDC.secureAuthBE.dto;
 
 public class LoginScript {
-    private String email;     // oppure "usernameOrEmail"
+    private String email;    
     private String password;
 
     public String getEmail() {

@@ -28,8 +28,6 @@ public class RegisterScript {
     	this.email = email;
     }
 
-    
-    
     public String getPassword() { 
     	return password; 
     }
