@@ -74,6 +74,7 @@ if (!response.ok) {
         secret: data.secret,
         qrCodeUri: data.qrCodeUri,
         email: payload.email, // opzionale, se ti serve dopo
+        replace: true 
       },
     });
   } else {

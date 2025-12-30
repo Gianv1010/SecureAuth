@@ -62,7 +62,7 @@ if (!response.ok) {
   setErrorMsg(data?.message ?? "Errore");
   return;
 }
-navigate("/login");
+navigate("/login", { replace: true });
 
 } catch (err) {
   console.error("Errore:", err);

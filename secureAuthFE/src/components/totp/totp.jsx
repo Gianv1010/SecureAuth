@@ -44,7 +44,7 @@ function QRcode() {
       return;
     }
     // ok
-    navigate("/welcome");
+    navigate("/welcome", { replace: true });
   } catch (errorMsg) {
     setErrorMsg("Errore di rete");
   }
@@ -56,7 +56,7 @@ function QRcode() {
   return (
     <div className="qr-page">
       <div className="qr-card">
-        <h2 className="qr-title">Scansiona il QR code</h2>
+        <h2 className="qr-title">Inserisci totp</h2>
         {/* Form sotto, separato: non deve comprimere il QR */}
         <form className="qr-form" onSubmit={handleSubmit}>
           <label className="qr-label" htmlFor="totpCode">Codice di verifica</label>

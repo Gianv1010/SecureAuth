@@ -75,7 +75,7 @@ if (code.length !== 6) return;
       return;
     }
     // ok
-    navigate("/welcome");
+    navigate("/welcome", { replace: true });
   } catch (errorMsg) {
     setErrorMsg("Errore di rete");
   }

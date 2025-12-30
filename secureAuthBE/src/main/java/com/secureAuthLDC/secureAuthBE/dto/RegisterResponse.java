@@ -11,7 +11,6 @@ public class RegisterResponse {
     private boolean success;
     private String message;
     private boolean enable2FA;
-
     // presenti SOLO se enable2FA = true
     private String secret;
     private String qrCodeUri;
