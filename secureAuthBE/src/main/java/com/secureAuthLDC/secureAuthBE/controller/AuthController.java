@@ -72,29 +72,19 @@ public class AuthController {
         return ResponseEntity.status(401).body(res);
     }
 
-    
-    
-    
-    
-
-
         @PostMapping("/forgot")
         public ResponseEntity<GenericResponse> forgot(@RequestBody ForgotPasswordRequest req) {
             // In dev: il tuo frontend sta su https://localhost
             // In produzione: mettilo in application.properties
-        	System.out.println(">>>>>>>>>>>>>>> HIT /api/auth/forgot: " + req.getEmail());
             String appBaseUrl = "https://localhost";
-            System.out.println(">>>>>>>>>>>>>>>> BEFORE service call");
 
             GenericResponse res = authService.forgotPassword(req.getEmail(), appBaseUrl);
-            System.out.println(">>>>>>>>>>>>>>>>>>>>> AFTER service call, returning 200");
 
             return ResponseEntity.status(201).body(res);
         }
 
         @PostMapping("/reset")
         public ResponseEntity<GenericResponse> reset(@RequestBody ResetPasswordRequest req) {
-            System.out.println(">>>>>>>>>>>>>>>>>>>>> TOKEN:" + req.getToken());
 
             GenericResponse res = authService.resetPassword(req.getToken(), req.getNewPassword(), req.getConfirmPassword());
 

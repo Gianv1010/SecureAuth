@@ -5,6 +5,7 @@ import com.secureAuthLDC.secureAuthBE.dto.RegisterScript;
 import com.secureAuthLDC.secureAuthBE.entity.PasswordResetToken;
 import com.secureAuthLDC.secureAuthBE.entity.RecoveryCode;
 import com.secureAuthLDC.secureAuthBE.entity.User;
+import com.secureAuthLDC.secureAuthBE.repository.PasswordHistoryRepository;
 import com.secureAuthLDC.secureAuthBE.repository.PasswordResetTokenRepository;
 import com.secureAuthLDC.secureAuthBE.repository.RecoveryCodeRepository;
 import com.secureAuthLDC.secureAuthBE.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.secureAuthLDC.secureAuthBE.security.CryptoService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +22,12 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
+import com.google.api.client.util.Value;
 import com.secureAuthLDC.secureAuthBE.dto.GenericResponse;
 import com.secureAuthLDC.secureAuthBE.dto.LoginResponse;
 import com.secureAuthLDC.secureAuthBE.dto.LoginScript;
+import com.secureAuthLDC.secureAuthBE.entity.PasswordHistory;
+
 
 @Service
 public class AuthService {
@@ -36,8 +40,11 @@ public class AuthService {
     private String keySecret;//posso commentarlo in quanto non viene mai usata
     private CryptoService crypto;
     private EmailService emailService;
+    private final PasswordHistoryRepository passwordHistoryRepository;
+    //@Value("${security.password.history_size:10}")
+    private int passwordHistorySize = 10;//contiene il valore history-size=N=10 --> prende gli ultime 10 password già utilizzate
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, CryptoService crypto, RecoveryCodeRepository recoveryCodeRespository, RecoveryCodeRepository recoveryCodeRepository,PasswordResetTokenRepository prtr, EmailService emailService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, CryptoService crypto, RecoveryCodeRepository recoveryCodeRespository, RecoveryCodeRepository recoveryCodeRepository,PasswordResetTokenRepository prtr, EmailService emailService, PasswordHistoryRepository passwordHistoryRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         totpService = new TotpService();
@@ -45,6 +52,7 @@ public class AuthService {
         this.recoveryCodeRepository = recoveryCodeRepository;
         this.prtr = prtr;
         this.emailService = emailService;
+        this.passwordHistoryRepository = passwordHistoryRepository;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -283,7 +291,8 @@ public class AuthService {
         if (!newPassword.equals(confirmPassword)) {
             return new GenericResponse(false, "Le password non coincidono.");
         }
-
+        
+        
         String tokenHash = sha256Base64Url(tokenPlain.trim());
 
         PasswordResetToken prt = prtr.findByTokenHashAndConsumedFalse(tokenHash).orElse(null);
@@ -296,6 +305,24 @@ public class AuthService {
         }
 
         User user = prt.getUser();
+        // 1) confronto con password attuale
+        if (passwordEncoder.matches(newPassword, user.getPasswordHash())) {
+            return new GenericResponse(false, "Utilizza una password che non hai mai usato.");
+
+        }
+        // 2) confronto con ultime N nello storico
+        //var riconosce direttamente il tipo che si trova dop =
+        var lastN = passwordHistoryRepository.findByUserOrderByCreatedAtDesc(
+            user, PageRequest.of(0, passwordHistorySize)
+        );
+
+        for (PasswordHistory ph : lastN) {
+            if (passwordEncoder.matches(newPassword, ph.getPasswordHash())) {
+                return new GenericResponse(false, "Utilizza una password che non hai mai usato.");
+            }
+        }
+        PasswordHistory passwordHistory = new PasswordHistory(user, user.getPasswordHash());
+        passwordHistoryRepository.save(passwordHistory);
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 

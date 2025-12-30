@@ -33,6 +33,7 @@ security:
     expiration-minutes: ${SECURITY_JWT_EXPIRATION_MINUTES}
   tink:
     keyset-b64: ${TINK_KEYSET_B64}
+
 app:
   mail:
     from: ${MAIL_USERNAME}

@@ -58,7 +58,7 @@ export default function FormEmail() {
 
   return (
     <div className="form">
-      <h2>Login</h2>
+      <h2>Inserisci email</h2>
 
       <form onSubmit={handleSubmit}>
         <label>Email</label>
@@ -70,8 +70,10 @@ export default function FormEmail() {
           onChange={handleChange}
           required
         />
-        {errorMsg ? <span className="error-text">{errorMsg}</span> : null}
-        <input type="submit" value="accedi"/>
+            {errorMsg !== "" ? (
+              <span className="error-text">{errorMsg}</span>
+            ) : null}        
+        <input type="submit" value="Invia email"/>
       </form>
     </div>
   );
