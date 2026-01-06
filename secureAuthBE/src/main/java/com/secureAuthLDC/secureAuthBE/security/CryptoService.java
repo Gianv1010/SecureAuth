@@ -24,7 +24,7 @@ public class CryptoService {
     byte[] keysetJsonBytes = Base64.getDecoder().decode(keysetB64);
     //permette di leggere i byte come stream (flusso di byte contigui)
     //CleartextKeysetHandle.read --> crea il KeysetHandle
-    KeysetHandle handle = CleartextKeysetHandle.read(
+    KeysetHandle handle = CleartextKeysetHandle.read( //in heandle si trova la primary key del keyset preso dalla variabile d'ambiente
     	//legge il json (JsonKeysetReader)
     	JsonKeysetReader.withInputStream(new ByteArrayInputStream(keysetJsonBytes))
     );

@@ -26,11 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //estende la
   }
 
   @Override
-  protected void doFilterInternal(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain filterChain
-  ) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
     String authHeader = request.getHeader("Authorization"); //prende il valore dall'header che ha come chiave Authorization
     if (authHeader == null || !authHeader.startsWith("Bearer ")) { //se authreader non ha authorization o non inizia con Bearer allora non fa nulla

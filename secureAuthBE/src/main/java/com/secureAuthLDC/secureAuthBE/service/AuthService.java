@@ -182,6 +182,7 @@ public class AuthService {
         //genero 10 codici
         for (int i = 0; i < 10; i++) {
             String code = generateSingleRecoveryCode(random);
+            //PasswordEncoder utilizza sempre Bcrypt ma con saltin e cost factor automatici, COMUNQUE OTTIMO!
             String hash = passwordEncoder.encode(code); // cripto il codice
 
             RecoveryCode rc = new RecoveryCode(user, hash);

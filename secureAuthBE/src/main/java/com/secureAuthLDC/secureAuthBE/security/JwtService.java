@@ -59,7 +59,7 @@ public class JwtService {
   //prende il token e controlla se è valido, se non è stato modificato, se non è scaduto e se è firmato con la sua key
   private Claims parseClaims(String token) {
     return Jwts.parser()
-        .verifyWith(key) //prende la chiave con cui è firmato il token
+        .verifyWith(key) //prende la chiave con cui è firmato il token e la verifica
         .build()
         .parseSignedClaims(token)//effettua tutti i controlli sul token
         .getPayload();//restituisce il payload ossia il claims

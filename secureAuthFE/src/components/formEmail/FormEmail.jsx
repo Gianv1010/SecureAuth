@@ -1,60 +1,60 @@
 import { useState } from "react";
 import "../FormRegister/formRegister.css";
-import { Link} from "react-router-dom";
 
 export default function FormEmail() {
+  const [formData, setFormData] = useState({ email: "" });
   const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-    const [formData, setFormData] = useState({
-    email: "",
-  });
-
-   function handleChange(e) {
-    const { name, value} = e.target; //destrutturazione di un oggetto serve per prendere il name e il value degli input (di cui name diventa la chiave per prendere i value degli input)
-                                      // equivalente: const name = e.target.name;
-                                                    //const value = e.target.value;
-    setFormData(prev => ({
-      ...prev, //prende tutti i campi aggiunti precedentemente
-      [name]: value 
-    }));
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errorMsg) setErrorMsg("");
+    if (successMsg) setSuccessMsg("");
   }
 
   async function handleSubmit(e) {
-      e.preventDefault(); //evita il comportamento di default del browser, cioè il ricarcio della pagina => l'azzeramento degli state => perdita di dati nel form
-  
-      //JSON da mandare al backend
-      const payload = {
-        email: formData.email,
-      };
-  
-      console.log("JSON inviato:", payload);
-  
+    e.preventDefault();
+    if (isLoading) return;
+
+    setErrorMsg("");
+    setSuccessMsg("");
+    setIsLoading(true);
+
     try {
       const response = await fetch("/api/auth/forgot", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-  
-    // prova a leggere JSON, ma senza far crashare se non è JSON
-  const data = await response.json().catch(() => null);
-  if (!data) {
-    setErrorMsg("Risposta non valida dal server");
-    return;
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email.trim() }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!data) {
+        setErrorMsg("Risposta non valida dal server");
+        return;
+      }
+
+      if (!response.ok) {
+        setErrorMsg(data.message ?? "Errore");
+        return;
+      }
+
+      if (!data.success) {
+        setErrorMsg(data.message ?? "Errore");
+        return;
+      }
+
+      //mostra conferma all’utente (tipico per forgot password)
+      setSuccessMsg(data.message ?? "Se l’email è registrata, ti abbiamo inviato un link.");
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Errore di rete");
+    }finally{
+        setIsLoading(false);
+    }
   }
-  if (!data.success) {
-    setErrorMsg(data.message ?? "Errore");
-    return;
-  }
-  if (!response.ok) {
-    setErrorMsg(data?.message ?? "Errore");
-    return;
-  }
-  } catch (err) {
-    console.error("Errore:", err);
-    setErrorMsg("Errore di rete");
-  }
-  }  
 
   return (
     <div className="form">
@@ -63,17 +63,19 @@ export default function FormEmail() {
       <form onSubmit={handleSubmit}>
         <label>Email</label>
         <input
-          type="text"
+          type="email"
           name="email"
           placeholder="Email..."
           maxLength={100}
+          value={formData.email}
           onChange={handleChange}
           required
         />
-            {errorMsg !== "" ? (
-              <span className="error-text">{errorMsg}</span>
-            ) : null}        
-        <input type="submit" value="Invia email"/>
+
+        {errorMsg ? <div className="error-text">{errorMsg}</div> : null}
+        {successMsg ? <div className="success-text">{successMsg}</div> : null}
+
+        <input type="submit" value={isLoading ? "Invio..." : "Invia email"} disabled={isLoading} />
       </form>
     </div>
   );
