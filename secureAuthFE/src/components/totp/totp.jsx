@@ -27,10 +27,10 @@ function QRcode() {
 
     const data = await response.json().catch(() => null);
 
-    if (!data) {
-      setErrorMsg("Risposta non valida dal server");
-      return;
-    }
+    //if (!data) {
+    //  setErrorMsg("Risposta non valida dal server");
+    //  return;
+    //}
 
     if (!response.ok || !data.success) {
       setErrorMsg(data.message ?? "Codice errato");
@@ -72,6 +72,9 @@ function QRcode() {
           <button className="qr-submit" type="submit" disabled={code.length !== 6}>
             Verifica codice
           </button>
+            {errorMsg !== "" ? (
+              <span className="error-text">{errorMsg}</span>
+            ) : null}
           <button className="qr-recoveryCodes" type="button" onClick={handleRecovery}>
             Voglio utilizzare codice di backup
           </button>
