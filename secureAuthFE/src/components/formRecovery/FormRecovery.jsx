@@ -68,7 +68,7 @@ export default function FormRecovery() {
         return;
       }
 
-      navigate("/welcome", { replace: true });
+      navigate("/welcome", { replace: true});
     } catch (err) {
       console.error(err);
       setErrorMsg("Errore di rete");

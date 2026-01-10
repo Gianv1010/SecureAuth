@@ -54,17 +54,13 @@ public class AuthService {
     public RegisterResponse register(RegisterScript request) throws Exception {
     	if(!request.getConfirmPassword().equals(request.getPassword())) {
     		return new RegisterResponse(false, "Le password non coincidono", false);
-    		//return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Le password non coincidono"));
     	}
     	
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
     		return new RegisterResponse(false, "Questa email è già stata utilizzata", false);
-        	//return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Questa email è già stata utilizzata"));
-
         }
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-    		return new RegisterResponse(false, "Questo username è già stato utilizzato", false);
-        	//return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Questo username è già stato utilizzato"));
+    		return new RegisterResponse(false, "Questo username è già stato utilizzato", false);        	//return ResponseEntity.badRequest().body(Map.of("status", "400", "message", "Questo username è già stato utilizzato"));
         }
 
     	User user = new User(request.getUsername(), request.getEmail(), passwordEncoder.encode(request.getPassword()), false, "");
@@ -81,8 +77,6 @@ public class AuthService {
     		return new RegisterResponse(true, "Utente registrato con successo con 2FA", true, secret, uriSecret);
             }
 		return new RegisterResponse(true, "Utente registrato con successo", false);
-
-    	//return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Utente registrato con successo"));
         }
     // ******METODO PER LOGIN******
     public LoginResponse login(LoginScript req) {
